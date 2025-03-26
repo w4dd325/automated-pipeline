@@ -1,0 +1,13 @@
+{
+  "name": "automated-pipeline",
+  "version": "1.0.0",
+  "description": "In this repo I will take you through all the steps required to setup your own automation pipeline.",
+  "main": "index.html",
+  "scripts": {
+    "docker:build": "docker build -t my-site .",
+    "docker:run": "docker run -d -p 8080:80 my-site"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
