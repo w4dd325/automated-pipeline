@@ -4,9 +4,9 @@ In this repo I will take you through all the steps required to setup your own au
 ## Creating an app
 For the purposes of this example project we will create a basic app that consists of three files. 
 
-index.html
-style.css
-script.js
+* index.html
+* style.css
+* script.js
 
 To keep things nice and simple the app will provide a button, and when clicked, will output the data and time.
 
@@ -65,3 +65,14 @@ The package.json file lives in the root directory and the commands are then trig
 and 
 ```npm run docker:run```
 
+## Deploying the app
+For simplicity I will use GitHub Pages to simulate deployment to a production environment. 
+
+To achieve this we first need to configure the repo to publish from the gh-pages branch. 
+To do this follow the steps here:
+https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-from-a-branch
+
+Then we can use the github-pages-deploy-action:
+https://github.com/JamesIves/github-pages-deploy-action
+
+This is a really simple Action that allows us to specify the folder we want to deploy. In this demo its the 'src' folder. This Action then pushes the files to the gh-pages branch and this then triggeres the automatic GitHub deployment.
