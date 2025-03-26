@@ -24,10 +24,6 @@ jobs:
           cd /src
           ls
 
-      - name: Upload static files as artifact
-        uses: actions/upload-pages-artifact@v1
-        with:
-          path: ./src
 
   deploy:
     needs: build
