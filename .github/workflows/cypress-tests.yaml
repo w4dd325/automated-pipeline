@@ -46,8 +46,11 @@ jobs:
         config-file: cypress.config.js
 
     - name: Stop the Docker container
+      if: always()
       run: |
         docker ps -q | xargs docker stop
 
   deploy_to_pages:
+    needs: cypress-tests
+
     uses: w4dd325/automated-pipeline/.github/workflows/deploy-to-gh-pages.yaml@main
