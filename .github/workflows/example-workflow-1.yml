@@ -1,4 +1,4 @@
-name: Example Workflow 1 - Pretend Security Checks
+name: Ex 1 - Pretend Security Checks
 
 on:
   push:
