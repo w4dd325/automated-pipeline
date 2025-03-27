@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_run:
-    workflows: ["cypress-tests", "sec", "light"]
+    workflows: ["cypress-tests", "ex-lighthouse-checks", "ex-security-checks"]
     types:
       - completed
   workflow_dispatch:
