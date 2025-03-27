@@ -1,10 +1,10 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+  workflow_run:
+    workflows: ["cypress-tests", "sec", "light"]
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -12,6 +12,7 @@ permissions:
   
 jobs:
   deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     runs-on: ubuntu-latest
 
