@@ -46,3 +46,6 @@ jobs:
     - name: Stop the Docker container
       run: |
         docker ps -q | xargs docker stop
+
+  deploy_to_pages:
+    uses: w4dd325/automated-pipeline/.github/workflows/deploy.yml@main

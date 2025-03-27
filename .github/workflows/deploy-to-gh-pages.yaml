@@ -1,12 +1,7 @@
 name: Deploy to GitHub Pages
 
 on:
-  workflow_run:
-    workflows: ["Run Cypress Tests", "Ex 2 - Pretend Lighthouse Checks", "Ex 1 - Pretend Security Checks"]
-    types:
-      - completed
-    branches:
-      - ready-for-test
+  workflow_call:
   workflow_dispatch:
 
 permissions:
@@ -14,7 +9,7 @@ permissions:
   
 jobs:
   deploy:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    #if: ${{ github.event.workflow_run.conclusion == 'success' }}
     
     runs-on: ubuntu-latest
 
