@@ -3,6 +3,8 @@ name: Ex 1 - Pretend Security Checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - ready-for-test
   workflow_dispatch:
 
 jobs:
