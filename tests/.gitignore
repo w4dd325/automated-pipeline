@@ -1,2 +1,5 @@
 node_modules
 downloads
+cypress.env.json
+screenshots
+videos

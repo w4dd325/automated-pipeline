@@ -1,7 +1,8 @@
 describe('My First Test', () => {
     it('Page should have expected elements', () => {
 
-        cy.visit('/'); // Uses baseUrl from cypress.config.js
+        const URL = Cypress.env('URL');
+        cy.visit(URL);
 
         cy.get('[test-id="instruction-text"]')
             .should('have.text', 'Click button to display datetime');
