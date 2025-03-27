@@ -6,7 +6,7 @@ module.exports = defineConfig({
       // implement node event listeners here
     },
     env: {
-      BASE_URL: process.env.BASE_URL || 'http://localhost:8080', // Fallback to local
+      BASE_URL: process.env.BASE_URL,
     },
     experimentalStudio: true,
   },
