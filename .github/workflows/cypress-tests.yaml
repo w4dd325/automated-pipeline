@@ -48,4 +48,4 @@ jobs:
         docker ps -q | xargs docker stop
 
   deploy_to_pages:
-    uses: w4dd325/automated-pipeline/.github/workflows/deploy.yml@main
+    uses: w4dd325/automated-pipeline/.github/workflows/deploy-to-gh-pages.yaml@main
