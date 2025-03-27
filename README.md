@@ -76,3 +76,12 @@ Then we can use the github-pages-deploy-action:
 https://github.com/JamesIves/github-pages-deploy-action
 
 This is a really simple Action that allows us to specify the folder we want to deploy. In this demo its the 'src' folder. This Action then pushes the files to the gh-pages branch and this then triggeres the automatic GitHub deployment.
+
+## Cypress tests
+I've created a test suite using Cypress to run some basic assertions against the app. 
+
+### Workflow to trigger tests locally
+https://github.com/w4dd325/automated-pipeline/blob/main/.github/workflows/cypress-tests.yaml
+
+### Workflow to trigger tests post-deployment
+
