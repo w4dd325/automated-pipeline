@@ -2,9 +2,11 @@ name: Deploy to GitHub Pages
 
 on:
   workflow_run:
-    workflows: ["cypress-tests", "ex-lighthouse-checks", "ex-security-checks"]
+    workflows: ["Run Cypress Tests", "Ex 2 - Pretend Lighthouse Checks", "Ex 1 - Pretend Security Checks"]
     types:
       - completed
+    branches:
+      - ready-for-test
   workflow_dispatch:
 
 permissions:
