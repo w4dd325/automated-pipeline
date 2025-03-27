@@ -43,7 +43,7 @@ jobs:
         working-directory: ./tests
         config-file: cypress.config.js
       env:
-        CYPRESS_BASE_URL: 'http://localhost:8080'
+        CYPRESS_URL: 'http://localhost:8080'
 
     - name: Stop the Docker container
       run: |
