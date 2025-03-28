@@ -66,6 +66,4 @@ jobs:
 
   deploy_to_pages:
     needs: auto-merge
-    uses: w4dd325/automated-pipeline/.github/workflows/deploy-from-action.yaml@main
-    with:
-      branch: ready-for-test
+    uses: w4dd325/automated-pipeline/.github/workflows/deploy-from-action.yaml@ready-for-test
