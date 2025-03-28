@@ -40,6 +40,12 @@ jobs:
       - name: Merge feature into ready-for-test
         run: |
           git fetch --all
+          if ! git show-ref --verify --quiet refs/heads/feature; then
+            echo "Feature branch not found locally, checking out from origin..."
+            git checkout -b feature origin/feature
+          else
+            git checkout feature
+          fi
           git checkout ready-for-test || git checkout -b ready-for-test origin/ready-for-test
           git pull origin ready-for-test
           git merge --no-ff feature -m "Auto-merging feature into ready-for-test"
