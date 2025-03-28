@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
   
 permissions:
-  contents: read  # Allows reading repository contents
+  contents: write  # Allows reading repository contents
   pages: write    # Allows publishing to GitHub Pages
   id-token: write # Required for authentication
   
@@ -62,7 +62,7 @@ jobs:
           git checkout ready-for-test || git checkout -b ready-for-test origin/ready-for-test
           git pull origin ready-for-test
           git merge --no-ff $SOURCE_BRANCH -m "Auto-merging $SOURCE_BRANCH into ready-for-test"
-          git push origin ready-for-test
+          git push https://github.com/${{ github.repository }}.git "ready-for-test" --token ${{ secrets.GITHUB_TOKEN }}
 
   deploy:
     environment:
