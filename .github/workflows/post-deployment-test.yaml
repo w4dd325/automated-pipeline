@@ -60,6 +60,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4.1.6
+        with:
+          branch: ready-for-test
 
       - name: Cypress run
         uses: cypress-io/github-action@v6.6.1
