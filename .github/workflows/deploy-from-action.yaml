@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
   
 permissions:
-  contents: write  # Allows reading repository contents
-  pages: write    # Allows publishing to GitHub Pages
-  id-token: write # Required for authentication
+  contents: write
+  pages: write
+  id-token: write
   
 jobs:
   build:
