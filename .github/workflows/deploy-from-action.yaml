@@ -1,0 +1,86 @@
+name: GitHub Pages From Action
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          branch: ready-for-test
+
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: src/
+
+      # MERGE TO READY-FOR-TEST BRANCH
+  merge-to-ready-for-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine source branch
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+          else
+            echo "SOURCE_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+          echo "Merging branch: $SOURCE_BRANCH"
+
+      - name: Merge feature into ready-for-test
+        run: |
+          git fetch --all
+
+          # Ensure source branch exists locally
+          if ! git show-ref --verify --quiet refs/heads/$SOURCE_BRANCH; then
+            echo "Branch $SOURCE_BRANCH not found locally, checking out from origin..."
+            git checkout -b $SOURCE_BRANCH origin/$SOURCE_BRANCH
+          else
+            git checkout $SOURCE_BRANCH
+          fi
+
+          # Checkout ready-for-test
+          git checkout ready-for-test || git checkout -b ready-for-test origin/ready-for-test
+          git pull origin ready-for-test
+          git merge --no-ff $SOURCE_BRANCH -m "Auto-merging $SOURCE_BRANCH into ready-for-test"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git "ready-for-test"
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    runs-on: ubuntu-latest
+    needs: merge-to-ready-for-test
+
+    steps:
+      - name: Checkout ready-for-test
+        uses: actions/checkout@v4
+        with:
+          ref: ready-for-test
+    
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+  deploy_to_pages:
+    needs: deploy
+    uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main

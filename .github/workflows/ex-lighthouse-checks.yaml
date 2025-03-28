@@ -3,10 +3,20 @@ name: Ex 2 - Pretend Lighthouse Checks
 on:
   pull_request:
     types: [opened, synchronize, reopened]
+    branches:
+      - ready-for-test
   workflow_dispatch:
 
 jobs:
-  say_hello:
+  run-test1:
+    runs-on: ubuntu-latest
+    steps:
+      
+      - name: Echo Message
+        run: echo "This is a pretend lighthouse workflow..."
+
+  run-test2:
+    needs: run-test1
     runs-on: ubuntu-latest
     steps:
       
