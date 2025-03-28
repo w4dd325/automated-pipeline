@@ -1,51 +1,52 @@
 name: Post Deployment Test
 
 on:
-  workflow_run:
-    workflows: ["pages-build-deployment"]
-    types:
-      - completed
+  workflow_call:
+  workflow_dispatch:
 
 jobs:
-  check-pages-status:
+  check-deployment:
     runs-on: ubuntu-latest
     steps:
-      - name: Ensure Pages Deployment Passed
+      - name: Check Deployment in Loop
         run: |
-          echo "Waiting for GitHub Pages deployment to complete..."
+          REPO="w4dd325/automated-pipeline"
+          MAX_WAIT=300  # 5 minutes (300 seconds)
+          INTERVAL=10   # Check every 10 seconds
+          START_TIME=$(date +%s)
 
-          GITHUB_API="https://api.github.com/repos/${{ github.repository }}/actions/runs"
-          STATUS=""
-          ATTEMPTS=0
-          MAX_ATTEMPTS=30  # 30 attempts * 10s = 5 minutes
+          while true; do
+            # Fetch latest deployment
+            DEPLOYMENTS=$(gh api repos/$REPO/deployments --jq '.[0]')
+            DEPLOYED_AT=$(echo "$DEPLOYMENTS" | jq -r '.created_at')
 
-          while [[ "$STATUS" != "completed" && $ATTEMPTS -lt $MAX_ATTEMPTS ]]; do
-            STATUS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$GITHUB_API" \
-              | jq -r '.workflow_runs[] | select(.name=="pages-build-deployment") | .status' | head -n 1)
+            # Convert time to epoch
+            DEPLOYED_EPOCH=$(date -d "$DEPLOYED_AT" +"%s")
+            CURRENT_EPOCH=$(date +"%s")
+            TIME_DIFF=$((CURRENT_EPOCH - DEPLOYED_EPOCH))
 
-            if [[ "$STATUS" == "completed" ]]; then
-              CONCLUSION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$GITHUB_API" \
-                | jq -r '.workflow_runs[] | select(.name=="pages-build-deployment") | .conclusion' | head -n 1)
-
-              if [[ "$CONCLUSION" == "success" ]]; then
-                echo "GitHub Pages deployment completed successfully!"
-                exit 0
-              else
-                echo "GitHub Pages deployment failed!"
-                exit 1
-              fi
+            # Check if deployment is within 5 minutes
+            if [ "$TIME_DIFF" -le 300 ]; then
+              echo "✅ Deployment is recent ($TIME_DIFF seconds ago)."
+              exit 0
             fi
 
-            echo "Deployment still in progress... Checking again in 10 seconds."
-            sleep 10
-            ((ATTEMPTS++))
-          done
+            # Check if max wait time is reached
+            NOW=$(date +%s)
+            ELAPSED=$((NOW - START_TIME))
+            if [ "$ELAPSED" -ge "$MAX_WAIT" ]; then
+              echo "❌ Deployment check timed out after 5 minutes."
+              exit 1
+            fi
 
-          echo "GitHub Pages deployment did not complete within 5 minutes."
-          exit 1
+            echo "⏳ Waiting for deployment... Checking again in $INTERVAL seconds."
+            sleep $INTERVAL
+          done
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   run-post-deployment-tests:
-    needs: check-pages-status
+    needs: check-deployment
     runs-on: ubuntu-latest
     steps:
       - name: Run Final Tests
