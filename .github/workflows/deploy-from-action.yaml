@@ -8,6 +8,10 @@ on:
     types:
       - completed
 
+  pull_request:
+    branches:
+      - ready-for-test
+
   workflow_dispatch:
   
 permissions:
@@ -20,29 +24,6 @@ jobs:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
-
-      - name: Report Deploy Workflow to PR Checks
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { repo, owner } = context.repo;
-            const pr = await github.rest.pulls.list({
-              owner,
-              repo,
-              head: context.payload.workflow_run.head_branch
-            });
-
-            if (pr.data.length > 0) {
-              await github.rest.checks.create({
-                owner,
-                repo,
-                name: "Deploy",
-                head_sha: context.payload.workflow_run.head_sha,
-                status: "in_progress"
-              });
-            }
-
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -66,29 +47,3 @@ jobs:
   #deploy_to_pages:
   #  needs: deploy
   #  uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
-
-      - name: Update PR Check Status
-        if: always()  # Ensures this step runs even if previous steps fail
-        uses: actions/github-script@v6
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            const { repo, owner } = context.repo;
-            const checkRun = await github.rest.checks.listForRef({
-              owner,
-              repo,
-              ref: context.payload.workflow_run.head_sha
-            });
-
-            const status = context.job.status === 'success' ? 'completed' : 'failure';
-
-            for (const check of checkRun.data.check_runs) {
-              if (check.name === "Deploy") {
-                await github.rest.checks.update({
-                  owner,
-                  repo,
-                  check_run_id: check.id,
-                  conclusion: status
-                });
-              }
-            }
