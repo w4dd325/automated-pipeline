@@ -61,7 +61,10 @@ jobs:
           # Checkout ready-for-test
           git checkout ready-for-test || git checkout -b ready-for-test origin/ready-for-test
           git pull origin ready-for-test
-          git merge --no-ff $SOURCE_BRANCH -m "Auto-merging $SOURCE_BRANCH into ready-for-test"
+          
+          git merge --squash $SOURCE_BRANCH
+          git commit -m "Squash merge $SOURCE_BRANCH into ready-for-test"
+
           git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git "ready-for-test"
 
   deploy:
@@ -76,7 +79,7 @@ jobs:
       - name: Checkout ready-for-test
         uses: actions/checkout@v4
         with:
-          ref: ready-for-test
+          branch: ready-for-test
     
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
