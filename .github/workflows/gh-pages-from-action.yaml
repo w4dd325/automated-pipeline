@@ -22,7 +22,7 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
       
     runs-on: ubuntu-latest
-    
+
     permissions:
       contents: read  # Allows reading repository contents
       pages: write    # Allows publishing to GitHub Pages
