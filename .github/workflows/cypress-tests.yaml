@@ -53,4 +53,4 @@ jobs:
   deploy_to_pages:
     needs: cypress-tests
 
-    uses: w4dd325/automated-pipeline/.github/workflows/deploy-to-gh-pages.yaml@main
+    uses: w4dd325/automated-pipeline/.github/workflows/gh-pages-from-action.yaml@main
