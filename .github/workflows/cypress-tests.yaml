@@ -52,5 +52,9 @@ jobs:
 
   deploy_to_pages:
     needs: cypress-tests
+    
+    permissions:
+      pages: write    # Allows publishing to GitHub Pages
+      id-token: write # Required for authentication
 
     uses: w4dd325/automated-pipeline/.github/workflows/gh-pages-from-action.yaml@main
