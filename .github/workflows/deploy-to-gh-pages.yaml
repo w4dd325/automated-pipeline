@@ -1,0 +1,26 @@
+name: Deploy to GitHub Pages
+
+on:
+  workflow_run:
+    workflows: ["cypress-tests", "sec", "light"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  
+jobs:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 🛎️
+        uses: actions/checkout@v4
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: src

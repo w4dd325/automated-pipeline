@@ -3,14 +3,8 @@ name: Run Cypress Tests
 on:
   pull_request:
     types: [opened, synchronize, reopened]
-    branches:
-      - ready-for-test
   workflow_dispatch:
-  
-permissions:
-  contents: write
-  pages: write
-  id-token: write
+
 
 jobs:
   cypress-tests:
@@ -20,7 +14,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
       with:
-        ref: ${{ github.head_ref }}
+        ref: ${{ github.head_ref }} # Check out the PR branch
 
     - name: Build the Docker image
       run: |
@@ -46,12 +40,9 @@ jobs:
         install: true
         working-directory: ./tests
         config-file: cypress.config.js
+      env:
+        CYPRESS_BASE_URL: 'http://localhost:8080'
 
     - name: Stop the Docker container
-      if: always()
       run: |
         docker ps -q | xargs docker stop
-
-  deploy_to_pages:
-    needs: cypress-tests
-    uses: w4dd325/automated-pipeline/.github/workflows/deploy-from-action.yaml@main

@@ -66,56 +66,16 @@ and
 ```npm run docker:run```
 
 ## Deploying the app
-Deployment is configured in GitHub using the 'deploy from action' option. 
-This can be set in /settings/pages.
+For simplicity I will use GitHub Pages to simulate deployment to a production environment. 
 
-![Deploy from action screenshot](image-1.png)
+To achieve this we first need to configure the repo to publish from the gh-pages branch. 
+To do this follow the steps here:
+https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-from-a-branch
 
-The workflow is then built using the following GitHub Actions:
-https://github.com/actions/deploy-pages
-https://github.com/actions/upload-pages-artifact
+Then we can use the github-pages-deploy-action:
+https://github.com/JamesIves/github-pages-deploy-action
 
-The final YAML should look like this:
-
-```yaml
-name: GitHub Pages From Action
-
-on:
-  workflow_dispatch:
-  
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Upload static files as artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: src/
-
-  deploy:
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-      
-    runs-on: ubuntu-latest
-    
-    permissions:
-      contents: read  # Allows reading repository contents
-      pages: write    # Allows publishing to GitHub Pages
-      id-token: write # Required for authentication
-      
-    needs: build
-    steps:
-      - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
-```
-
-When triggered you should see a success message in /deployments/github-pages.
-
-![Successful deployment screenshot](image-2.png)
+This is a really simple Action that allows us to specify the folder we want to deploy. In this demo its the 'src' folder. This Action then pushes the files to the gh-pages branch and this then triggeres the automatic GitHub deployment.
 
 ## Cypress tests
 I've created a test suite using Cypress to run some basic assertions against the app. 
@@ -124,7 +84,4 @@ I've created a test suite using Cypress to run some basic assertions against the
 https://github.com/w4dd325/automated-pipeline/blob/main/.github/workflows/cypress-tests.yaml
 
 ### Workflow to trigger tests post-deployment
-
-
-
 

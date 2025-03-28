@@ -1,67 +1,58 @@
 name: Post Deployment Test
 
 on:
-  workflow_call:
-  workflow_dispatch:
-  
-permissions:
-  contents: read  # Allows reading repository contents
-  pages: write    # Allows publishing to GitHub Pages
-  id-token: write # Required for authentication
+  workflow_run:
+    workflows: ["pages-build-deployment"]
+    types:
+      - completed
 
 jobs:
-  check-deployment:
+  check-pages-status:
     runs-on: ubuntu-latest
     steps:
-      - name: Check Deployment in Loop
+      - name: Ensure Pages Deployment Passed
         run: |
-          REPO="w4dd325/automated-pipeline"
-          MAX_WAIT=300  # 5 minutes (300 seconds)
-          INTERVAL=10   # Check every 10 seconds
-          START_TIME=$(date +%s)
+          echo "Waiting for GitHub Pages deployment to complete..."
 
-          while true; do
-            # Fetch latest deployment
-            DEPLOYMENTS=$(gh api repos/$REPO/deployments --jq '.[0]')
-            DEPLOYED_AT=$(echo "$DEPLOYMENTS" | jq -r '.created_at')
+          GITHUB_API="https://api.github.com/repos/${{ github.repository }}/actions/runs"
+          STATUS=""
+          ATTEMPTS=0
+          MAX_ATTEMPTS=30  # 30 attempts * 10s = 5 minutes
 
-            # Convert time to epoch
-            DEPLOYED_EPOCH=$(date -d "$DEPLOYED_AT" +"%s")
-            CURRENT_EPOCH=$(date +"%s")
-            TIME_DIFF=$((CURRENT_EPOCH - DEPLOYED_EPOCH))
+          while [[ "$STATUS" != "completed" && $ATTEMPTS -lt $MAX_ATTEMPTS ]]; do
+            STATUS=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$GITHUB_API" \
+              | jq -r '.workflow_runs[] | select(.name=="pages-build-deployment") | .status' | head -n 1)
 
-            # Check if deployment is within 5 minutes
-            if [ "$TIME_DIFF" -le 300 ]; then
-              echo "✅ Deployment is recent ($TIME_DIFF seconds ago)."
-              exit 0
+            if [[ "$STATUS" == "completed" ]]; then
+              CONCLUSION=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "$GITHUB_API" \
+                | jq -r '.workflow_runs[] | select(.name=="pages-build-deployment") | .conclusion' | head -n 1)
+
+              if [[ "$CONCLUSION" == "success" ]]; then
+                echo "GitHub Pages deployment completed successfully!"
+                exit 0
+              else
+                echo "GitHub Pages deployment failed!"
+                exit 1
+              fi
             fi
 
-            # Check if max wait time is reached
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ "$ELAPSED" -ge "$MAX_WAIT" ]; then
-              echo "❌ Deployment check timed out after 5 minutes."
-              exit 1
-            fi
-
-            echo "⏳ Waiting for deployment... Checking again in $INTERVAL seconds."
-            sleep $INTERVAL
+            echo "Deployment still in progress... Checking again in 10 seconds."
+            sleep 10
+            ((ATTEMPTS++))
           done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          echo "GitHub Pages deployment did not complete within 5 minutes."
+          exit 1
 
   run-post-deployment-tests:
-    needs: check-deployment
+    needs: check-pages-status
     runs-on: ubuntu-latest
-    
     steps:
       - name: Run Final Tests
         run: echo "GitHub Pages deployment is complete! Running final tests."
 
       - name: Checkout
         uses: actions/checkout@v4.1.6
-        with:
-          branch: ready-for-test
 
       - name: Cypress run
         uses: cypress-io/github-action@v6.6.1
@@ -70,4 +61,5 @@ jobs:
           install: true
           working-directory: tests
           config-file: cypress.config.js
-          config: baseUrl=https://w4dd325.github.io/automated-pipeline/
+        env:
+          CYPRESS_BASE_URL: 'https://w4dd325.github.io/automated-pipeline/'

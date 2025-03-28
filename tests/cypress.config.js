@@ -4,14 +4,10 @@ module.exports = defineConfig({
   e2e: {
     setupNodeEvents(on, config) {
       // implement node event listeners here
-      on("task", {
-        log(message) {
-          console.log(message);
-          return null;
-        },
-      });
     },
-    baseUrl: "http://localhost:8080",
+    env: {
+      BASE_URL: process.env.BASE_URL,
+    },
     experimentalStudio: true,
   },
 });
