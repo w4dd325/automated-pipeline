@@ -1,0 +1,38 @@
+name: GitHub Pages From Action
+
+on:
+  workflow_call:
+  workflow_dispatch:
+  
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Upload static files as artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: src/
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+      
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read  # Allows reading repository contents
+      pages: write    # Allows publishing to GitHub Pages
+      id-token: write # Required for authentication
+      
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v4
+
+  deploy_to_pages:
+    needs: deploy
+    uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
