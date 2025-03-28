@@ -1,17 +1,11 @@
 name: GitHub Pages From Action
 
 on:
-  #workflow_call:
-
+  workflow_call:
   workflow_run:
     workflows: ["Run Cypress Tests"]
     types:
       - completed
-
-  pull_request:
-    branches:
-      - ready-for-test
-
   workflow_dispatch:
   
 permissions:
@@ -44,6 +38,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-  #deploy_to_pages:
-  #  needs: deploy
-  #  uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
+  deploy_to_pages:
+    needs: deploy
+    uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main

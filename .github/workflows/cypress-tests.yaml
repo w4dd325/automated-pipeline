@@ -52,6 +52,6 @@ jobs:
       run: |
         docker ps -q | xargs docker stop
 
-  #deploy_to_pages:
-  #  needs: cypress-tests
-  #  uses: w4dd325/automated-pipeline/.github/workflows/deploy-from-action.yaml@main
+  deploy_to_pages:
+    needs: cypress-tests
+    uses: w4dd325/automated-pipeline/.github/workflows/deploy-from-action.yaml@main

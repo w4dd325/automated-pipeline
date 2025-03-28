@@ -1,17 +1,11 @@
 name: Post Deployment Test
 
 on:
-  #workflow_call:
-
+  workflow_call:
   workflow_run:
     workflows: ["GitHub Pages From Action"]
     types:
       - completed
-
-  pull_request:
-    branches:
-      - ready-for-test
-
   workflow_dispatch:
   
 permissions:
