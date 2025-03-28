@@ -1,4 +1,4 @@
-name: Run Cypress Tests
+name: GitHub Pages From Action
 
 on:
   workflow_dispatch:
