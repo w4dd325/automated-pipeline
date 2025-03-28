@@ -4,6 +4,11 @@ on:
   workflow_call:
   workflow_dispatch:
   
+permissions:
+  contents: read  # Allows reading repository contents
+  pages: write    # Allows publishing to GitHub Pages
+  id-token: write # Required for authentication
+  
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -22,13 +27,8 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
       
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read  # Allows reading repository contents
-      pages: write    # Allows publishing to GitHub Pages
-      id-token: write # Required for authentication
-      
     needs: build
+    
     steps:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
