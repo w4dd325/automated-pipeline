@@ -2,10 +2,6 @@ name: Post Deployment Test
 
 on:
   workflow_call:
-  workflow_run:
-    workflows: ["GitHub Pages From Action"]
-    types:
-      - completed
   workflow_dispatch:
   
 permissions:
@@ -15,7 +11,6 @@ permissions:
 
 jobs:
   check-deployment:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check Deployment in Loop
