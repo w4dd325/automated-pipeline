@@ -8,9 +8,9 @@ on:
   workflow_dispatch:
   
 permissions:
-  contents: read  # Allows reading repository contents
-  pages: write    # Allows publishing to GitHub Pages
-  id-token: write # Required for authentication
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   cypress-tests:
@@ -20,7 +20,7 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4.2.2
       with:
-        ref: ${{ github.head_ref }} # Check out the PR branch
+        ref: ${{ github.head_ref }}
 
     - name: Build the Docker image
       run: |
