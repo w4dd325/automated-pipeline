@@ -37,18 +37,31 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: Determine source branch
+        run: |
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            echo "SOURCE_BRANCH=${{ github.head_ref }}" >> $GITHUB_ENV
+          else
+            echo "SOURCE_BRANCH=${{ github.ref_name }}" >> $GITHUB_ENV
+          fi
+          echo "Merging branch: $SOURCE_BRANCH"
+
       - name: Merge feature into ready-for-test
         run: |
           git fetch --all
-          if ! git show-ref --verify --quiet refs/heads/feature; then
-            echo "Feature branch not found locally, checking out from origin..."
-            git checkout -b feature origin/feature
+
+          # Ensure source branch exists locally
+          if ! git show-ref --verify --quiet refs/heads/$SOURCE_BRANCH; then
+            echo "Branch $SOURCE_BRANCH not found locally, checking out from origin..."
+            git checkout -b $SOURCE_BRANCH origin/$SOURCE_BRANCH
           else
-            git checkout feature
+            git checkout $SOURCE_BRANCH
           fi
+
+          # Checkout ready-for-test
           git checkout ready-for-test || git checkout -b ready-for-test origin/ready-for-test
           git pull origin ready-for-test
-          git merge --no-ff feature -m "Auto-merging feature into ready-for-test"
+          git merge --no-ff $SOURCE_BRANCH -m "Auto-merging $SOURCE_BRANCH into ready-for-test"
           git push origin ready-for-test
 
   deploy:
