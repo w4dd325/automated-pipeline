@@ -76,7 +76,7 @@ jobs:
       - name: Checkout ready-for-test
         uses: actions/checkout@v4
         with:
-          ref: ready-for-test
+          branch: ready-for-test
     
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
