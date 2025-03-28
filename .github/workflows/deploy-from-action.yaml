@@ -23,6 +23,19 @@ jobs:
         with:
           path: src/
 
+      # MERGE TO READY-FOR-TEST BRANCH
+      - name: Set up Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Merge feature into ready-for-test
+        run: |
+          git checkout ready-for-test
+          git pull origin ready-for-test
+          git merge --no-ff feature -m "Auto-merging feature into ready-for-test"
+          git push origin ready-for-test
+
   deploy:
     environment:
       name: github-pages
@@ -38,3 +51,5 @@ jobs:
   deploy_to_pages:
     needs: deploy
     uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
+    with:
+      ref: ready-for-test
