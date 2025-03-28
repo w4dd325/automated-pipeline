@@ -33,45 +33,6 @@ jobs:
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
-  check-deployment:
+  deploy_to_pages:
     needs: deploy
-    
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Check Deployment in Loop
-        run: |
-          REPO="w4dd325/automated-pipeline"
-          MAX_WAIT=300  # 5 minutes (300 seconds)
-          INTERVAL=10   # Check every 10 seconds
-          START_TIME=$(date +%s)
-
-          while true; do
-            # Fetch latest deployment
-            DEPLOYMENTS=$(gh api repos/$REPO/deployments --jq '.[0]')
-            DEPLOYED_AT=$(echo "$DEPLOYMENTS" | jq -r '.created_at')
-
-            # Convert time to epoch
-            DEPLOYED_EPOCH=$(date -d "$DEPLOYED_AT" +"%s")
-            CURRENT_EPOCH=$(date +"%s")
-            TIME_DIFF=$((CURRENT_EPOCH - DEPLOYED_EPOCH))
-
-            # Check if deployment is within 5 minutes
-            if [ "$TIME_DIFF" -le 300 ]; then
-              echo "✅ Deployment is recent ($TIME_DIFF seconds ago)."
-              exit 0
-            fi
-
-            # Check if max wait time is reached
-            NOW=$(date +%s)
-            ELAPSED=$((NOW - START_TIME))
-            if [ "$ELAPSED" -ge "$MAX_WAIT" ]; then
-              echo "❌ Deployment check timed out after 5 minutes."
-              exit 1
-            fi
-
-            echo "⏳ Waiting for deployment... Checking again in $INTERVAL seconds."
-            sleep $INTERVAL
-          done
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    uses: w4dd325/automated-pipeline/.github/workflows/gh-pages-from-action.yaml@main
