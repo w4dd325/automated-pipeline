@@ -24,6 +24,9 @@ jobs:
           path: src/
 
       # MERGE TO READY-FOR-TEST BRANCH
+  merge-to-ready-for-test:
+    runs-on: ubuntu-latest
+    steps:
       - name: Set up Git
         run: |
           git config --global user.name "github-actions[bot]"
@@ -42,14 +45,17 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
       
     runs-on: ubuntu-latest
-    needs: build
-    
+    needs: merge-to-ready-for-test
+
     steps:
+      - name: Checkout ready-for-test
+        uses: actions/checkout@v4
+        with:
+          ref: ready-for-test
+    
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
 
   deploy_to_pages:
     needs: deploy
     uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
-    with:
-      ref: ready-for-test
