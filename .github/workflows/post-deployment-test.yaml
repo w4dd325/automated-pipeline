@@ -3,6 +3,11 @@ name: Post Deployment Test
 on:
   workflow_call:
   workflow_dispatch:
+  
+permissions:
+  contents: read  # Allows reading repository contents
+  pages: write    # Allows publishing to GitHub Pages
+  id-token: write # Required for authentication
 
 jobs:
   check-deployment:
@@ -48,6 +53,7 @@ jobs:
   run-post-deployment-tests:
     needs: check-deployment
     runs-on: ubuntu-latest
+    
     steps:
       - name: Run Final Tests
         run: echo "GitHub Pages deployment is complete! Running final tests."
