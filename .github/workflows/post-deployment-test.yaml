@@ -8,6 +8,10 @@ on:
     types:
       - completed
 
+  pull_request:
+    branches:
+      - ready-for-test
+
   workflow_dispatch:
   
 permissions:
