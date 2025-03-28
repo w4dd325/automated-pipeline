@@ -37,4 +37,4 @@ jobs:
 
   deploy_to_pages:
     needs: deploy
-    uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@ready-for-test
+    uses: w4dd325/automated-pipeline/.github/workflows/post-deployment-test.yaml@main
